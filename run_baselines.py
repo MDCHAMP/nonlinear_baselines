@@ -13,8 +13,8 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 # %%
 
-baseline = 'ARX'# os.environ['BASELINE']
-benchmark = 'SB' # os.environ['BENCHMARK']
+baseline = os.environ['BASELINE']
+benchmark = os.environ['BENCHMARK']
 
 if __name__ == "__main__":
     t0 = time.perf_counter()
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     t1 = time.perf_counter()
     np.savez_compressed(
         f"results/{baseline}_{benchmark}.npz",
-        pred=pred,
+        **{f'test_{i}':p for i, p in enumerate(pred)},
         score=score,
         time=t1-t0,
         meta=flatten(meta),
