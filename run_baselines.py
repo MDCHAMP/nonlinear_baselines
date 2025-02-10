@@ -11,8 +11,8 @@ from dataload import benchmarks_tvt as bench
 
 # %%
 
-baseline = "LSTM"
-benchmark = "CT"
+baseline = "ARX"
+benchmark = "SB"
 
 # baseline = os.environ['BASELINE']
 # benchmark = os.environ['BENCHMARK']
@@ -23,11 +23,11 @@ if __name__ == "__main__":
     t1 = time.perf_counter()
     np.savez_compressed(
         f"results/{baseline}_{benchmark}.npz",
-        pred=pred,
+        **{f'test_{i}':p for i, p in enumerate(pred)},
         score=score,
         time=t1-t0,
         meta=flatten(meta),
     )
 
-# res = np.load(f"results/{baseline}_{benchmark}.npz", allow_pickle=1)
-# print(res['meta'])
+res = np.load(f"results/{baseline}_{benchmark}.npz", allow_pickle=1)
+print(res)
