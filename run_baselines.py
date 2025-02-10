@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import time
-import jax
 import jax.random as jr
 
 from src.tricks import flatten
@@ -9,13 +8,13 @@ from src.tricks import flatten
 from trainers import all_trainers as base
 from dataload import benchmarks_tvt as bench
 
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 # %%
 
-baseline = "LSTM"
-benchmark = "CT"
-
-# baseline = os.environ['BASELINE']
-# benchmark = os.environ['BENCHMARK']
+baseline = 'ARX'# os.environ['BASELINE']
+benchmark = 'SB' # os.environ['BENCHMARK']
 
 if __name__ == "__main__":
     t0 = time.perf_counter()
@@ -28,6 +27,8 @@ if __name__ == "__main__":
         time=t1-t0,
         meta=flatten(meta),
     )
+    print(f'{baseline} {benchmark} complete in {t1-t0:4g}s. {score=}')
 
+# load results as
 # res = np.load(f"results/{baseline}_{benchmark}.npz", allow_pickle=1)
 # print(res['meta'])

@@ -5,3 +5,6 @@ __pycache__/
 *.pyd
 .vscode
 results
+.output
+scratch.py
+slurm_launch.py
