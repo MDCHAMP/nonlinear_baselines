@@ -19,7 +19,6 @@ def flatten(dic, prefix=""):
     result = {}
     for k, v in dic.items():
         if isinstance(v, dict):
-            print("here")
             for k1, v1 in flatten(v, prefix + k).items():
                 result[k1] = v1
         else:
