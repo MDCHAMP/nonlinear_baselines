@@ -78,8 +78,8 @@ def batch_SLS(Xbatch, Ybatch):
 def multi_predict_AR(datas, lags, F, theta):
     preds = []
     for tgt in datas:
-        YMPO, _ = predict(*tgt, *lags, F, theta, "MPO")
-        preds.append(YMPO)
+        YMPO, slc = predict(*tgt, *lags, F, theta, "MPO")
+        preds.append(YMPO[slc])
     return preds
 
 
@@ -94,7 +94,10 @@ def evaluate(data, preds, inv, k=0, eval_type="test", metric=rmse):
         tgt,
         pred,
     ) in zip(targets, preds):
-        neval = tgt.y.shape[0] - opts['max_ny']
+        if eval_type == "val":
+            neval = pred.shape[0] # compare everything after the lags
+        elif eval_type == 'test':
+            neval = tgt.y.shape[0] - opts['max_ny'] # use the cuttoff for the test set
         score = metric(inv(tgt.y)[-neval:], inv(pred)[-neval:], k)
         scores.append(score)
     return np.array(scores)
@@ -125,13 +128,15 @@ def ARX_lag_scan(data, inv, n_batch=1, max_lag=None):
                 H, Y, _ = batch_Hank(trains, nx, ny, n_batch=n_batch)
                 alpha = batch_SLS(H, Y)
                 preds = multi_predict_AR(vals, (nx, ny), F_ARX, alpha)
-                scores = evaluate(data, preds, inv, nx + ny, "val", AIC)
+
+                scores = evaluate(data, preds, inv, H.shape[-1], "val", AIC)
                 score = np.mean(scores)
                 # print(nx, ny, score)
                 if score < best:
                     best = score
                     lags = nx, ny
-            except ValueError:
+            except ValueError as e:
+                raise e
                 continue
     return lags
 
