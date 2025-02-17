@@ -76,19 +76,9 @@ def GPNARX_trainer(data, key):
         "jit": True,
     }
     H, Y, _ = batch_Hank(trains, *lags, n_batch=1)
-    k0, k1, k2 = jax.random.split(key)
-    idx = jr.randint(
-        k0,
-        (
-            min(
-                1000,
-                H.shape[1],
-            )
-        ),
-        0,
-        H.shape[1],
-    )
-    # no batching, only use 1k randomly sampled points - no FITC
+    k1, k2 = jax.random.split(key)
+    idx = slice(1000, 2000, None)
+    # no batching, only use 1k inital points as before - no FITC
     H = H.reshape(-1, H.shape[-1])[idx]
     Y = Y.reshape(-1, Y.shape[-1])[idx]
     train_GP, F_GPNARX, _, nlml = jeep.GP(H, Y, jeep.SE)
@@ -160,9 +150,11 @@ def RNN_trainer(model_type, data, key):
     data, inv = scale_data(data, scaler=MM, scaler_params={"feature_range": (0, 1)})
     trains, vals, tests, opts = data
     n_batch = opts["n_batch"]
-    lags = ARX_lag_scan(data, inv, n_batch, opts["max_lag"])
+    # lags = ARX_lag_scan(data, inv, n_batch, opts["max_lag"])
     n_inits = 10
     nhs = [2, 4, 8, 16, 32]
+    nxs = [2, 4, 8, 16, 32]
+    nxs = nxs[nxs < opts['max_ny']]
     opt_ions = {
         "num_iters": opts['NN_opt_iters'],
         "thresh": None,
@@ -173,7 +165,7 @@ def RNN_trainer(model_type, data, key):
     # wrap in xval loop
     best_xval_score = 10e10
     for nh in nhs:
-        for nx in np.floor(np.arange(2, opts["max_ny"], 5)).astype(int):
+        for nx in nxs:
             lags = nx, 0
             model = model_type(nh)
             opter, Htrain = multi_train_NN(trains, model, lags, n_batch, opt_ions)
@@ -186,7 +178,7 @@ def RNN_trainer(model_type, data, key):
             val_score = evaluate(data, val_preds, inv, nh, "val", AIC).mean()
             if val_score < best_xval_score:
                 best_xval_score = val_score
-                best_xval = dc(model), nh, nx, best_theta
+                best_xval = dc(model), dc(nh), dc(nx), dc(best_theta)
 
     model, nh, nx, final_theta = best_xval
     preds = multi_predict_NN(tests, (nx, 0), model, final_theta)
