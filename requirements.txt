@@ -1,1 +1,8 @@
 git+https://github.com/MaartenSchoukens/nonlinear_benchmarks
+jupyter
+jax
+flax
+numpy
+scipy
+simple_slurm
+optax

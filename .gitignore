@@ -8,3 +8,4 @@ results
 .output
 scratch.py
 slurm_launch.py
+bench_env
