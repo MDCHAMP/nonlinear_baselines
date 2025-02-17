@@ -96,7 +96,7 @@ def GPNARX_trainer(data, key):
         val_scores.append(evaluate(data, preds, inv, 3, "val", AIC).mean())
     # evaluate on test set
     best_theta = jax.tree.map(lambda a: a[np.argmin(np.array(val_scores))], thetas)
-    preds = multi_predict_AR(tests, lags, F_GPNARX, train_GP(theta))
+    preds = multi_predict_AR(tests, lags, F_GPNARX, train_GP(best_theta))
     scores = evaluate(data, preds, inv) * opts["rmse_scaling"]
     return preds, scores, {"lags": lags, **best_theta, "key": key}
 
