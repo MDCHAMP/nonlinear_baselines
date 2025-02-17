@@ -6,3 +6,4 @@ numpy
 scipy
 simple_slurm
 optax
+matplotlib
