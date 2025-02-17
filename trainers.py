@@ -77,7 +77,7 @@ def GPNARX_trainer(data, key):
     }
     H, Y, _ = batch_Hank(trains, *lags, n_batch=1)
     k1, k2 = jax.random.split(key)
-    idx = slice(1000, 2000, None)
+    idx = slice(None, 1000, None)
     # no batching, only use 1k inital points as before - no FITC
     H = H.reshape(-1, H.shape[-1])[idx]
     Y = Y.reshape(-1, Y.shape[-1])[idx]
