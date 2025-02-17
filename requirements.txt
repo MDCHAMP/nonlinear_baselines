@@ -7,3 +7,4 @@ scipy
 simple_slurm
 optax
 matplotlib
+scikit-learn
