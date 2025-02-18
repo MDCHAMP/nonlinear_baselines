@@ -176,6 +176,7 @@ def RNN_trainer(model_type, data, key):
 
             val_preds = multi_predict_NN(vals, lags, model, best_theta)
             val_score = evaluate(data, val_preds, inv, nh, "val", AIC).mean()
+            print(nh, nx, val_score)
             if val_score < best_xval_score:
                 best_xval_score = val_score
                 best_xval = dc(model), dc(nh), dc(nx), dc(best_theta)
