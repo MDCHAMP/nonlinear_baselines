@@ -1,5 +1,5 @@
 # %% imports
-
+import os
 from copy import deepcopy as dc
 
 import numpy as np
@@ -118,6 +118,11 @@ def Batch_ARX_MPO(trains, vals, lags_x, lags_y, n_batch):
 
 
 def ARX_lag_scan(data, inv, n_batch=1, max_lag=None):
+    if 'LAG_OVERRIDE_NX' in os.environ: # override ARX lags and skip xval
+        nx = int(os.environ['LAG_OVERRIDE_NX'])
+        ny = int(os.environ['LAG_OVERRIDE_NY'])
+        return nx,ny
+
     trains, vals, _, opts = data
     if max_lag is None:
         max_lag = opts['max_lag']
