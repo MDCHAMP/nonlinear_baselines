@@ -28,7 +28,7 @@ if __name__ == "__main__":
         meta=flatten(meta),
     )
     print(f'{baseline} {benchmark} complete in {t1-t0:4g}s. {score=}')
-
+    print(flatten(meta))
 # load results as
 # res = np.load(f"results/{baseline}_{benchmark}.npz", allow_pickle=1)
 # print(res['meta'])
