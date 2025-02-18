@@ -102,7 +102,7 @@ def GPNARX_trainer(data, key):
 
 
 def MLPNARX_trainer(data, key):
-    data, inv = scale_data(data, scaler=MM, scaler_params={"feature_range": (0, 1)})
+    data, inv = scale_data(data, scaler=MM, scaler_params={"feature_range": (-1, 1)})
     trains, vals, tests, opts = data
     n_batch = opts["n_batch"]
     lags = ARX_lag_scan(data, inv, n_batch, opts["max_lag"])
