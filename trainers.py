@@ -152,8 +152,8 @@ def RNN_trainer(model_type, data, key):
     n_batch = opts["n_batch"]
     # lags = ARX_lag_scan(data, inv, n_batch, opts["max_lag"])
     n_inits = 10
-    nhs = [2, 4, 8, 16, 32]
-    nxs = [2, 4, 8, 16, 32]
+    nhs = np.array([2, 4, 8, 16, 32])
+    nxs = np.array([2, 4, 8, 16, 32])
     nxs = nxs[nxs < opts['max_ny']]
     opt_ions = {
         "num_iters": opts['NN_opt_iters'],
