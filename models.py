@@ -136,7 +136,6 @@ def ARX_lag_scan(data, inv, n_batch=1, max_lag=None):
                     best = score
                     lags = nx, ny
             except ValueError as e:
-                raise e
                 continue
     return lags
 
