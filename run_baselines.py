@@ -12,13 +12,13 @@ import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 # %%
-
+# Read form env variable or pass a string as 
 baseline = os.environ['BASELINE']
 benchmark = os.environ['BENCHMARK']
 
 if __name__ == "__main__":
     t0 = time.perf_counter()
-    pred, score, meta = base[baseline](bench[benchmark], jr.key(0))
+    pred, score, meta = base[baseline](bench[benchmark], jr.key(0)) # all paper results are produced with key=jr.key(0) PRNG Key initial state.
     t1 = time.perf_counter()
     np.savez_compressed(
         f"results/{baseline}_{benchmark}.npz",
