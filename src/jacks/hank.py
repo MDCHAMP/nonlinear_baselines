@@ -1,4 +1,4 @@
-from MDC.jacks import jax
+from src.jacks import jax
 
 def hank(X, lags):
     """

@@ -1,7 +1,7 @@
 # %%
 import jax
 import jax.numpy as jnp
-from jax.scipy.linalg import cho_solve, cho_factor, solve_triangular
+from jax.scipy.linalg import cho_solve, cho_factor
 
 
 # ## helpers

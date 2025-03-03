@@ -30,8 +30,8 @@ for baseline in base:
         job.add_cmd(f'export BENCHMARK="{benchmark}"')
         
         if benchmark=='CED': # See paper for rationale
-            job.add_cmd(f'export LAG_OVERRIDE_NX="10"')
-            job.add_cmd(f'export LAG_OVERRIDE_NY="10"')
+            job.add_cmd('export LAG_OVERRIDE_NX="10"')
+            job.add_cmd('export LAG_OVERRIDE_NY="10"')
     
         print(benchmark, baseline)
         jid = job.sbatch('./bench_env/bin/python run_baselines.py')
