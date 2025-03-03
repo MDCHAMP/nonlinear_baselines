@@ -145,15 +145,6 @@ def ARX_lag_scan(data, inv, n_batch=1, max_lag=None):
     return lags
 
 
-# data = benchmarks_tvt["SB"]
-# data, inv = scale_data(data)
-# trains, vals, tests, opts = data
-# n_batch = 1
-# lags = 10, 10  # ARX_lag_scan(data, inv, n_batch, 3)
-# preds = Batch_ARX_MPO(trains, tests, *lags, n_batch)
-# scores = evaluate(data, preds, inv) * 1000
-# print(scores)
-
 # %% P-NARX
 
 
@@ -167,86 +158,10 @@ def F_PNARX(H, theta):
     return basis(H, theta["order"]) @ theta["alpha"]
 
 
-# data = benchmarks_tvt["SB"]
-# data, inv = scale_data(data)
-# trains, vals, tests, opts = data
-
-# lags = 10, 10#ARX_lag_scan(data, inv, n_batch, 10)
-# n_batch = 100
-
-# H, Y, _ = batch_Hank(trains, *lags, n_batch=n_batch)
-
-# best = 10e10  # xval for model order
-# for order in range(2,10):
-#     phi = basis(H, order)
-#     alpha = batch_SLS(phi, Y)
-#     theta = {'alpha':alpha, 'order':order}
-#     preds = multi_predict_AR(vals, lags, F_PNARX, theta)
-#     scores = evaluate(data, preds, inv, phi.shape[-1], "val", AIC)
-#     print(scores, order)
-#     if scores.mean() < best:
-#         best = scores.mean()
-#         best_order = order
-
-# best_alpha = batch_SLS(basis(H, best_order), Y)
-# theta = {'alpha':best_alpha, 'order':best_order}
-# preds = multi_predict_AR(tests, lags, F_PNARX, theta)
-# evaluate(data, preds, inv)*1000
 
 # %% GP-NARX
 
-# data = benchmarks_tvt["SB"]
-# data, inv = scale_data(data)
-# trains, vals, tests, opts = data
 
-# lags = 10, 10  # ARX_lag_scan(data, inv, n_batch, 10)
-# n_inits = 10
-# n_inducing = 200
-# opt_ions = {
-#     "num_iters": 500,
-#     "thresh": None,
-#     "optimizer": optax.adam(learning_rate=1e-2),
-#     "vb": False,
-#     "jit": True,
-# }
-
-# key = jr.key(0)
-# k0, k1, k2, k3 = jax.random.split(key, 4)
-
-# H, Y, _ = batch_Hank(trains, *lags, n_batch=1)
-# H = H[0]  # no batching
-# Y = Y[0]
-
-# # Use FITC approximation for > 200 training examples
-# if n_inducing < H.shape[0]:  # use sparse GP
-#     idx = np.arange(0, H.shape[0], H.shape[0] // n_inducing)
-#     train_GP, F_GPNARX, _, nlml = jeep.FITC(H, Y, H[idx], jeep.SE)
-# else:
-#     train_GP, F_GPNARX, _, nlml = jeep.GP(H, Y, jeep.SE)
-
-# theta0 = {
-#     "sf_se": jnp.zeros((n_inits, 1)),
-#     "sn": jax.random.uniform(k2, minval=-5, maxval=0, shape=(n_inits, 1)),
-#     "ll": jax.random.uniform(k3, minval=-3, maxval=2, shape=(n_inits, 1)),
-# }
-# thetas, hists = jax.pmap(opt.optaximiser(nlml, **opt_ions))(theta0)
-
-# plt.plot(hists.T)
-
-# # select best model on validation set
-# best = 10e10
-# val_scores = []
-# for i in range(n_inits):
-#     theta = jax.tree.map(lambda a: a[i], thetas)
-#     preds = multi_predict_AR(vals, lags, F_GPNARX, train_GP(theta))
-#     val_scores.append(evaluate(data, preds, inv, 3, "val", AIC).mean())
-# print(val_scores)
-
-# # evaluate
-# best_theta = jax.tree.map(lambda a: a[np.argmin(np.array(val_scores))], thetas)
-# preds = multi_predict_AR(tests, lags, F_GPNARX, train_GP(theta))
-# scores = evaluate(data, preds, inv)
-# print(scores)
 
 # %% NN models
 
@@ -321,82 +236,3 @@ def multi_train_NN(trains, model, lags, n_batch, opts):
 
     return opt.optaximiser(NN_loss, **opts), H
 
-
-# %% MLP-NARX
-
-
-# data = benchmarks_tvt["SB"]
-# data, inv = scale_data(data)
-# trains, vals, tests, opts = data
-
-# lags = 10, 10  # ARX_lag_scan(data, inv, n_batch, 10)
-# n_inits = 10
-# n_batch = 10
-# nh = 10
-# opt_ions = {
-#     "num_iters": 100,
-#     "thresh": None,
-#     "optimizer": optax.adam(learning_rate=1e-2),
-#     "vb": False,
-#     "jit": True,
-# }
-
-# # wrap in xval loop
-
-# model = MLP(nh)
-# opter, Htrain = multi_train_NN(trains, model, lags, n_batch, opt_ions)
-# keys = jr.split(jr.key(0), n_inits)
-# theta0s = jax.vmap(model.init)(keys, Htrain)
-# thetas, histories = jax.pmap(opter)(theta0s)
-# best_theta = jax.tree.map(lambda a: a[jnp.argmin(histories[:, -1])], thetas)
-
-
-# def F_MLP(h, theta):
-#     return model.apply(theta, h)
-
-
-# val_preds = multi_predict_AR(vals, lags, F_MLP, best_theta)
-# val_scores = evaluate(data, val_preds, inv, nh, "val", AIC)
-# print(val_scores)
-
-# preds = multi_predict_AR(tests, lags, F_MLP, best_theta)
-# scores = evaluate(data, preds, inv) * 1000
-
-
-# %% RNN-type models
-
-# nh = 50
-# n_batch = 10
-# lags = 10, 0
-# n_inits = 10
-# model_type = RNN
-# opt_ions = {
-#     "num_iters": 100,
-#     "thresh": None,
-#     "optimizer": optax.adam(learning_rate=1e-3),
-#     "vb": False,
-#     "jit": True,
-# }
-
-# data = benchmarks_tvt["SB"]
-# data, inv = scale_data(data)  # MM scaling for NNs
-# trains, vals, tests, opts = data
-
-# # wrap in xval loop
-
-# model = model_type(nh)
-# opter, Htrain = multi_train(trains, model, lags, n_batch, opt_ions)
-# keys = jr.split(jr.key(0), n_inits)
-# theta0s = jax.vmap(model.init)(keys, Htrain)
-# thetas, histories = jax.pmap(opter)(theta0s)
-# best_theta = jax.tree.map(lambda a: a[jnp.argmin(histories[:, -1])], thetas)
-
-# val_preds = multi_predict_NN(vals, lags, model, best_theta)
-# val_scores = evaluate(data, val_preds, inv, nh, "val", AIC)
-# print(val_scores)
-
-# preds = multi_predict_NN(tests, lags, model, best_theta)
-# scores = evaluate(data, preds, inv) * 1000
-
-# plt.plot(histories.T)
-# print(scores)
