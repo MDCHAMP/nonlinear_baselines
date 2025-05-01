@@ -8,3 +8,5 @@ __pycache__/
 scratch.py
 slurm_launch.py
 bench_env
+.misc
+NLB25_figures

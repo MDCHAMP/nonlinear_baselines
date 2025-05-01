@@ -8,3 +8,4 @@ simple_slurm
 optax
 matplotlib
 scikit-learn
+pandas
