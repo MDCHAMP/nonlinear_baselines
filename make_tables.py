@@ -233,7 +233,29 @@ for baseline in base:
     scores += "\\\\"
     print(f"{baseline:<10} {scores}")
 
+# %% Misc data format
 
+def time_fmt(time):
+    if time < 1:
+        return '<1 sec'
+    elif time < 60:
+        return '1-60 sec'
+    elif time < 3600:
+        return '1-60 min'
+    elif time < 24*3600:
+        return '1-24 hours'
+    elif time < 24*3600*4:
+        return '1-4 days'
+    else:
+        return '>4 days'
+
+for file in os.listdir('./results'):
+    ba, be = file[:-4].split('_')
+    res = np.load(f'./results/{file}')
+    # print(ba, be, res['score'])
+    # print(time_fmt(res['time']))
+    print(ba)
+# %%%
 
 # Failed tests
 
