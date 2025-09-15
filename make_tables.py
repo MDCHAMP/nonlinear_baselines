@@ -251,10 +251,12 @@ def time_fmt(time):
 
 for file in os.listdir('./results'):
     ba, be = file[:-4].split('_')
+    if not be == 'ParWH': continue
+    if not ba in ['GRU', 'LSTM', 'OLSTM', 'RNN']: continue
     res = np.load(f'./results/{file}')
-    # print(ba, be, res['score'])
+    print(res['score'])
     # print(time_fmt(res['time']))
-    print(ba)
+    # print(score)
 # %%%
 
 # Failed tests
