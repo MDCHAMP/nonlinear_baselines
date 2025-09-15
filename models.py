@@ -12,7 +12,8 @@ from flax.linen.module import nowrap
 
 from src.jacks import jax, jnp, jr
 from src import polys
-from src.hank import NARXify, predict
+from src.hank import NARXify
+from src.hank import predict_np as predict
 from src.jacks import jeep, opt
 from src.linalg import stable_least_squares as SLS
 from src.metrics import AIC, rmse
@@ -128,7 +129,7 @@ def ARX_lag_scan(data, inv, n_batch=1, max_lag=None):
         max_lag = opts['max_lag']
     best = 10e10
     for nx in range(1, max_lag + 1):  # use the same as y for now
-        for ny in range(1, max_lag + 1):
+        for ny in range(1, max_lag + 1): # because cannot have lag at zero
             try:
                 H, Y, _ = batch_Hank(trains, nx, ny, n_batch=n_batch)
                 alpha = batch_SLS(H, Y)
