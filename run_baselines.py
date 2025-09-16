@@ -12,9 +12,14 @@ import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 # %%
+
 # Read form env variable or pass a string as 
 baseline = os.environ['BASELINE']
 benchmark = os.environ['BENCHMARK']
+
+if benchmark == "CED":  # See paper for rationale
+    os.environ["LAG_OVERRIDE_NX"] = "10"
+    os.environ["LAG_OVERRIDE_NY"] = "10"
 
 if __name__ == "__main__":
     t0 = time.perf_counter()
@@ -29,6 +34,7 @@ if __name__ == "__main__":
     )
     print(f'{baseline} {benchmark} complete in {t1-t0:4g}s. {score=}')
     print(flatten(meta))
+
 # load results as
 # res = np.load(f"results/{baseline}_{benchmark}.npz", allow_pickle=1)
 # print(res['meta'])

@@ -3,7 +3,9 @@ config.update("jax_enable_x64", True)
 
 import os
 os.environ["XLA_FLAGS"] = '--xla_force_host_platform_device_count=10'
-
 import jax
+
+print(jax.default_backend()) 
+
 import jax.numpy as jnp
 import jax.random as jr
