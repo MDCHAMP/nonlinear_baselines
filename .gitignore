@@ -10,3 +10,5 @@ slurm_launch.py
 bench_env
 .misc
 NLB25_figures
+results_previous/
+comp_tables/
